@@ -150,13 +150,13 @@ html, body {
 
     <button class="sound-button green" onclick="playSound('correct1',this)">
       🟢 CORRECT!
-      <span class="duration" id="duration-correct">Loading...</span>
+      <span class="duration" id="duration-correct1">Loading...</span>
       <div class="progress"><div class="progress-fill"></div></div>
     </button>
 
     <button class="sound-button yellow" onclick="playSound('jeopardy',this)">
       🎵 JEOPARDY THEME
-      <span class="duration" id="duration-theme">Loading...</span>
+      <span class="duration" id="duration-jeopardy">Loading...</span>
       <div class="progress"><div class="progress-fill"></div></div>
     </button>
 
@@ -174,7 +174,7 @@ html, body {
 
     <button class="sound-button red" onclick="playSound('omgbruh',this)">
       💀 OMG BRUH
-      <span class="duration" id="duration-bruh">Loading...</span>
+      <span class="duration" id="duration-omgbruh">Loading...</span>
       <div class="progress"><div class="progress-fill"></div></div>
     </button>
 
@@ -251,11 +251,28 @@ html, body {
     </button>
 
     <button class="sound-button yellow" onclick="playSound('fine',this)">
-      😢 I'm Fine
-      <span class="duration" id="duration-wow">Loading...</span>
+      😢 I'M FINE
+      <span class="duration" id="duration-fine">Loading...</span>
       <div class="progress"><div class="progress-fill"></div></div>
     </button>
 
+    <button class="sound-button yellow" onclick="playSound('ready',this)">
+      🍍🧽 I'm Ready
+      <span class="duration" id="duration-fine">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('crickets',this)">
+      🦗 Crickets
+      <span class="duration" id="duration-fine">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('dirtman',this)">
+      🛌🏻 Dirtman
+      <span class="duration" id="duration-fine">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
   </div>
 
   <div id="timer">00:00 / 00:00</div>
@@ -269,6 +286,11 @@ html, body {
 <!-- SOUND FILES -->
 
 <audio id="correct1" src="sounds/correct1.mp3" preload="metadata"></audio>
+
+<audio id="crickets" src="sounds/crickets.mp3" preload="metadata"></audio>
+<audio id="dirtman" src="sounds/dirtman.mp3" preload="metadata"></audio>
+<audio id="ready" src="sounds/ready.mp3" preload="metadata"></audio>
+
 <audio id="fine" src="sounds/fine.mp3" preload="metadata"></audio>
 <audio id="jeopardy" src="sounds/jeopardy.mp3" preload="metadata"></audio>
 <audio id="easy" src="sounds/easy.mp3" preload="metadata"></audio>
@@ -276,7 +298,6 @@ html, body {
 <audio id="omgbruh" src="sounds/omgbruh.mp3" preload="metadata"></audio>
 <audio id="nooo" src="sounds/nooo.mp3" preload="metadata"></audio>
 <audio id="augh" src="sounds/augh.mp3" preload="metadata"></audio>
-
 <audio id="goat" src="sounds/goat.mp3" preload="metadata"></audio>
 <audio id="duckquack" src="sounds/duckquack.mp3" preload="metadata"></audio>
 <audio id="yeahboi" src="sounds/yeahboi.mp3" preload="metadata"></audio>
@@ -288,7 +309,6 @@ html, body {
 <audio id="romance" src="sounds/romance.mp3" preload="metadata"></audio>
 <audio id="wow" src="sounds/wow.mp3" preload="metadata"></audio>
 
-
 <script>
 
 let currentSound = null;
@@ -296,37 +316,45 @@ let currentButton = null;
 
 const sounds = document.querySelectorAll("audio");
 
-// Format audio time
+// Format time
 function formatTime(seconds) {
   if (!Number.isFinite(seconds)) return "00:00";
 
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
 
-  return String(min).padStart(2,"0") + ":" +
-         String(sec).padStart(2,"0");
+  return String(min).padStart(2, "0") + ":" +
+         String(sec).padStart(2, "0");
 }
 
-// Load audio durations
+// Load audio information and listeners
 sounds.forEach(audio => {
 
-  audio.addEventListener("loadedmetadata", () => {
-    const display = document.getElementById(
-      "duration-" + audio.id
-    );
+  const display = document.getElementById(
+    "duration-" + audio.id
+  );
 
-    if (display) {
+  function showDuration() {
+    if (display && Number.isFinite(audio.duration)) {
       display.textContent = formatTime(audio.duration);
+    }
+  }
+
+  audio.addEventListener("loadedmetadata", showDuration);
+  audio.addEventListener("durationchange", showDuration);
+
+  audio.addEventListener("timeupdate", () => {
+    if (audio === currentSound) {
+      updateProgress();
     }
   });
 
-  audio.addEventListener("timeupdate", () => {
-    if (audio === currentSound) updateProgress();
-  });
-
   audio.addEventListener("ended", () => {
+
     if (audio === currentSound) {
+
       resetDisplay();
+
       currentSound = null;
       currentButton = null;
 
@@ -336,15 +364,20 @@ sounds.forEach(audio => {
       document.getElementById("status").textContent =
         "🎮 SOUND EFFECTS";
     }
+
   });
 
   audio.addEventListener("error", () => {
-    const display = document.getElementById(
-      "duration-" + audio.id
-    );
 
-    if (display) display.textContent = "File missing";
+    if (display) {
+      display.textContent = "FILE NOT FOUND";
+    }
+
+    console.error("Audio error:", audio.src);
+
   });
+
+  audio.load();
 
 });
 
@@ -356,6 +389,12 @@ function playSound(name, button) {
   currentSound = document.getElementById(name);
   currentButton = button;
 
+  if (!currentSound) {
+    document.getElementById("status").textContent =
+      "⚠️ SOUND NOT FOUND";
+    return;
+  }
+
   currentButton.classList.add("playing");
 
   document.getElementById("status").textContent =
@@ -364,14 +403,17 @@ function playSound(name, button) {
   currentSound.currentTime = 0;
 
   currentSound.play().catch(error => {
+
     console.log("Audio playback error:", error);
 
     document.getElementById("status").textContent =
       "⚠️ SOUND COULD NOT PLAY";
 
     resetDisplay();
+
     currentSound = null;
     currentButton = null;
+
   });
 
 }
@@ -388,14 +430,19 @@ function updateProgress() {
     formatTime(current) + " / " + formatTime(duration);
 
   if (currentButton && duration > 0) {
+
     const fill = currentButton.querySelector(".progress-fill");
 
-    fill.style.width =
-      (current / duration * 100) + "%";
+    if (fill) {
+      fill.style.width =
+        (current / duration * 100) + "%";
+    }
+
   }
+
 }
 
-// Reset buttons
+// Reset buttons and progress bars
 function resetDisplay() {
 
   document.querySelectorAll(".sound-button").forEach(button => {
@@ -404,7 +451,9 @@ function resetDisplay() {
 
     const fill = button.querySelector(".progress-fill");
 
-    if (fill) fill.style.width = "0%";
+    if (fill) {
+      fill.style.width = "0%";
+    }
 
   });
 
@@ -414,8 +463,10 @@ function resetDisplay() {
 function stopSound() {
 
   sounds.forEach(audio => {
+
     audio.pause();
     audio.currentTime = 0;
+
   });
 
   resetDisplay();
