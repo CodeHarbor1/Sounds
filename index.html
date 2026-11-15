@@ -250,6 +250,12 @@ html, body {
       <div class="progress"><div class="progress-fill"></div></div>
     </button>
 
+    <button class="sound-button yellow" onclick="playSound('fine',this)">
+      😢 I'm Fine
+      <span class="duration" id="duration-wow">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
   </div>
 
   <div id="timer">00:00 / 00:00</div>
@@ -263,6 +269,7 @@ html, body {
 <!-- SOUND FILES -->
 
 <audio id="correct1" src="sounds/correct1.mp3" preload="metadata"></audio>
+<audio id="fine" src="sounds/fine.mp3" preload="metadata"></audio>
 <audio id="jeopardy" src="sounds/jeopardy.mp3" preload="metadata"></audio>
 <audio id="easy" src="sounds/easy.mp3" preload="metadata"></audio>
 <audio id="bruh" src="sounds/bruh.mp3" preload="metadata"></audio>
