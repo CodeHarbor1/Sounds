@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Game Show Soundboard</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #dc3545;
+}
+
+#screen {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#status {
+  width: 100%;
+  padding: 17px 8px;
+  border-radius: 18px;
+  background: #dc3545;
+  color: white;
+  font-size: clamp(22px, 5vw, 34px);
+  font-weight: bold;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#grid {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(115px, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  align-content: start;
+  padding: 4px;
+}
+
+.sound-button {
+  min-width: 0;
+  min-height: 115px;
+  border: none;
+  border-radius: 17px;
+  color: white;
+  font-size: clamp(14px, 3.5vw, 23px);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 4px;
+  touch-action: manipulation;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+.sound-button:active {
+  transform: scale(0.96);
+}
+
+.green { background: #28a745; }
+.yellow { background: #ffc107; color: black; }
+.red { background: #dc3545; }
+.blue { background: #1769aa; }
+.purple { background: #7138a5; }
+.orange { background: #e87522; }
+.darkblue { background: #263c75; }
+
+.sound-button.playing {
+  outline: 4px solid white;
+}
+
+.duration {
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.progress {
+  width: 90%;
+  height: 6px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: white;
+}
+
+#timer {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  min-height: 20px;
+  flex-shrink: 0;
+}
+
+#stop {
+  width: 100%;
+  min-height: 70px;
+  border: none;
+  border-radius: 17px;
+  background: #202020;
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#stop:active {
+  transform: scale(0.97);
+}
+</style>
+</head>
+
+<body>
+
+<div id="screen">
+
+  <div id="status">🎮 SOUND EFFECTS</div>
+
+  <div id="grid">
+
+    <button class="sound-button green" onclick="playSound('correct',this)">
+      🟢 CORRECT!
+      <span class="duration" id="duration-correct">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('theme',this)">
+      🎵 JEOPARDY THEME
+      <span class="duration" id="duration-theme">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button blue" onclick="playSound('easy',this)">
+      🎵 EASY
+      <span class="duration" id="duration-easy">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button red" onclick="playSound('bruh',this)">
+      💀 WTF BRUH
+      <span class="duration" id="duration-bruh">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button red" onclick="playSound('omgbruh',this)">
+      💀 OMG BRUH
+      <span class="duration" id="duration-bruh">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button purple" onclick="playSound('nooo',this)">
+      😭 NOOO
+      <span class="duration" id="duration-nooo">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('augh',this)">
+      😵 AUGH
+      <span class="duration" id="duration-augh">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button orange" onclick="playSound('goat',this)">
+      🐐 GOAT
+      <span class="duration" id="duration-goat">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button blue" onclick="playSound('duckquack',this)">
+      🦆 DUCK QUACK
+      <span class="duration" id="duration-duckquack">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button green" onclick="playSound('yeahboi',this)">
+      😎 YEAH BOI
+      <span class="duration" id="duration-yeahboi">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button red" onclick="playSound('whip',this)">
+      🏏 WHIP
+      <span class="duration" id="duration-whip">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('tada',this)">
+      🎉 TADA!
+      <span class="duration" id="duration-tada">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button purple" onclick="playSound('clown',this)">
+      🤡 CLOWN
+      <span class="duration" id="duration-clown">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button darkblue" onclick="playSound('dundun',this)">
+      😨 DUN DUN
+      <span class="duration" id="duration-dundun">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button red" onclick="playSound('spongebobfail',this)">
+      ❌ SPONGEBOB FAIL
+      <span class="duration" id="duration-spongebobfail">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button purple" onclick="playSound('romance',this)">
+      ❤️ ROMANCE
+      <span class="duration" id="duration-romance">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+    <button class="sound-button yellow" onclick="playSound('wow',this)">
+      😮 WOW!
+      <span class="duration" id="duration-wow">Loading...</span>
+      <div class="progress"><div class="progress-fill"></div></div>
+    </button>
+
+  </div>
+
+  <div id="timer">00:00 / 00:00</div>
+
+  <button id="stop" onclick="stopSound()">
+    ⏹ STOP SOUND
+  </button>
+
+</div>
+
+<!-- SOUND FILES -->
+
+<audio id="correct" src="sounds/correct.mp3" preload="metadata"></audio>
+<audio id="theme" src="sounds/jeopardy%20theme.mp3" preload="metadata"></audio>
+<audio id="easy" src="sounds/easy.mp3" preload="metadata"></audio>
+<audio id="bruh" src="sounds/bruh.mp3" preload="metadata"></audio>
+<audio id="omgbruh" src="sounds/omgbruh.mp3" preload="metadata"></audio>
+<audio id="nooo" src="sounds/nooo.mp3" preload="metadata"></audio>
+<audio id="augh" src="sounds/augh.mp3" preload="metadata"></audio>
+
+<audio id="goat" src="sounds/goat.mp3" preload="metadata"></audio>
+<audio id="duckquack" src="sounds/duckquack.mp3" preload="metadata"></audio>
+<audio id="yeahboi" src="sounds/yeahboi.mp3" preload="metadata"></audio>
+<audio id="whip" src="sounds/whip.mp3" preload="metadata"></audio>
+<audio id="tada" src="sounds/tada.mp3" preload="metadata"></audio>
+<audio id="clown" src="sounds/clown.mp3" preload="metadata"></audio>
+<audio id="dundun" src="sounds/dun%20dun.mp3" preload="metadata"></audio>
+<audio id="spongebobfail" src="sounds/spongebobfail.mp3" preload="metadata"></audio>
+<audio id="romance" src="sounds/romance.mp3" preload="metadata"></audio>
+<audio id="wow" src="sounds/wow.mp3" preload="metadata"></audio>
+
+
+<script>
+
+let currentSound = null;
+let currentButton = null;
+
+const sounds = document.querySelectorAll("audio");
+
+// Format audio time
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "00:00";
+
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+
+  return String(min).padStart(2,"0") + ":" +
+         String(sec).padStart(2,"0");
+}
+
+// Load audio durations
+sounds.forEach(audio => {
+
+  audio.addEventListener("loadedmetadata", () => {
+    const display = document.getElementById(
+      "duration-" + audio.id
+    );
+
+    if (display) {
+      display.textContent = formatTime(audio.duration);
+    }
+  });
+
+  audio.addEventListener("timeupdate", () => {
+    if (audio === currentSound) updateProgress();
+  });
+
+  audio.addEventListener("ended", () => {
+    if (audio === currentSound) {
+      resetDisplay();
+      currentSound = null;
+      currentButton = null;
+
+      document.getElementById("timer").textContent =
+        "00:00 / 00:00";
+
+      document.getElementById("status").textContent =
+        "🎮 SOUND EFFECTS";
+    }
+  });
+
+  audio.addEventListener("error", () => {
+    const display = document.getElementById(
+      "duration-" + audio.id
+    );
+
+    if (display) display.textContent = "File missing";
+  });
+
+});
+
+// Play sound
+function playSound(name, button) {
+
+  stopSound();
+
+  currentSound = document.getElementById(name);
+  currentButton = button;
+
+  currentButton.classList.add("playing");
+
+  document.getElementById("status").textContent =
+    "▶ PLAYING: " + name.toUpperCase();
+
+  currentSound.currentTime = 0;
+
+  currentSound.play().catch(error => {
+    console.log("Audio playback error:", error);
+
+    document.getElementById("status").textContent =
+      "⚠️ SOUND COULD NOT PLAY";
+
+    resetDisplay();
+    currentSound = null;
+    currentButton = null;
+  });
+
+}
+
+// Update progress and timer
+function updateProgress() {
+
+  if (!currentSound) return;
+
+  const duration = currentSound.duration;
+  const current = currentSound.currentTime;
+
+  document.getElementById("timer").textContent =
+    formatTime(current) + " / " + formatTime(duration);
+
+  if (currentButton && duration > 0) {
+    const fill = currentButton.querySelector(".progress-fill");
+
+    fill.style.width =
+      (current / duration * 100) + "%";
+  }
+}
+
+// Reset buttons
+function resetDisplay() {
+
+  document.querySelectorAll(".sound-button").forEach(button => {
+
+    button.classList.remove("playing");
+
+    const fill = button.querySelector(".progress-fill");
+
+    if (fill) fill.style.width = "0%";
+
+  });
+
+}
+
+// Stop all sounds
+function stopSound() {
+
+  sounds.forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+
+  resetDisplay();
+
+  currentSound = null;
+  currentButton = null;
+
+  document.getElementById("timer").textContent =
+    "00:00 / 00:00";
+
+  document.getElementById("status").textContent =
+    "🎮 SOUND EFFECTS";
+
+}
+
+</script>
+
+</body>
+</html>
