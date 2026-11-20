@@ -8,7 +8,6 @@ content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>Game Show Soundboard</title>
 
-
 <style>
 * {
   box-sizing: border-box;
@@ -36,8 +35,6 @@ body {
   padding: 10px;
 }
 
-/* STATUS */
-
 #status {
   background: #dc3545;
   color: white;
@@ -47,8 +44,6 @@ body {
   font-size: clamp(22px, 5vw, 32px);
   font-weight: bold;
 }
-
-/* FOLDERS */
 
 #folders {
   width: 100%;
@@ -91,8 +86,6 @@ body {
   font-size: 25px;
 }
 
-/* FOLDER CONTENT */
-
 .folder-content {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -105,8 +98,6 @@ body {
   display: none;
 }
 
-/* COLORFUL MP3 BUTTONS */
-
 .sound-file {
   width: 100%;
   min-width: 0;
@@ -117,18 +108,14 @@ body {
   font-size: clamp(14px, 3.5vw, 21px);
   font-weight: bold;
   cursor: pointer;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 7px;
-
   padding: 9px 5px;
   touch-action: manipulation;
-
   box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-
   transition: transform 0.1s;
 }
 
@@ -136,46 +123,19 @@ body {
   transform: scale(0.96);
 }
 
-/* BUTTON COLORS */
-
-.green {
-  background: #28a745;
-}
-
-.yellow {
-  background: #ffc107;
-  color: black;
-}
-
-.red {
-  background: #dc3545;
-}
-
-.blue {
-  background: #1769aa;
-}
-
-.purple {
-  background: #7138a5;
-}
-
-.orange {
-  background: #e87522;
-}
-
-.darkblue {
-  background: #263c75;
-}
-
-/* PLAYING BUTTON */
+.green { background: #28a745; }
+.yellow { background: #ffc107; color: black; }
+.red { background: #dc3545; }
+.blue { background: #1769aa; }
+.purple { background: #7138a5; }
+.orange { background: #e87522; }
+.darkblue { background: #263c75; }
 
 .sound-file.playing {
   outline: 4px solid white;
   outline-offset: -4px;
   filter: brightness(1.15);
 }
-
-/* FILE DETAILS */
 
 .file-icon {
   font-size: 25px;
@@ -207,8 +167,6 @@ body {
   background: white;
 }
 
-/* PLAYER */
-
 #timer {
   color: white;
   font-size: 17px;
@@ -234,8 +192,6 @@ body {
   transform: scale(0.97);
 }
 
-/* SMALL SCREENS */
-
 @media (max-width: 350px) {
   .folder-content {
     gap: 7px;
@@ -247,7 +203,6 @@ body {
     font-size: 13px;
   }
 }
-
 </style>
 </head>
 
@@ -270,25 +225,22 @@ body {
 <script>
 
 // ==================================
-// FOLDER AND SOUND ORGANIZATION
+// EMOJIS
 // ==================================
 
 const soundEmojis = {
-  // ANIMALS
   crickets: "🦗",
   duckquack: "🦆",
   goat: "🐐",
   marmot: "🦫",
-
-  // EFFECTS
+  happi: "😊",
   augh: "😵",
   bruh: "💀",
   correct: "🟢",
   "dun dun": "😨",
   tada: "🎉",
   whip: "🏏",
-
-  // MEMES
+  
   easy: "😎",
   fine: "😢",
   nooo: "😭",
@@ -305,7 +257,7 @@ const soundEmojis = {
   thatswhatshesaid: "🤪",
   wilheamscream: "😱",
   sixseven: "67",
-  // SONGS
+
   clown: "🤡",
   dirtman: "🛌🏻",
   jeopardy: "🎵",
@@ -316,14 +268,16 @@ const soundEmojis = {
   wiimusic: "🎶",
   spongebob: "🤪",
 
-  // TV
   ready: "🍍🧽",
   spongebobfail: "❌",
   mayo: "🫙",
   money: "💰",
-  thatsroughbuddy: "🥲",
-
+  thatsroughbuddy: "🥲"
 };
+
+// ==================================
+// FOLDERS
+// ==================================
 
 const folderData = [
 
@@ -345,6 +299,7 @@ const folderData = [
       "correct",
       "dun dun",
       "tada",
+      "happi",
       "whip"
     ]
   },
@@ -366,13 +321,23 @@ const folderData = [
       "oof",
       "johncena",
       "sadviolin",
-      "thatswhatshesaid", "wilheamscream", "sixseven"
+      "thatswhatshesaid",
+      "wilheamscream",
+      "sixseven"
     ]
   },
 
   {
     name: "songs",
-    sounds: ["clown","dirtman","jeopardy","penapple","corn","wiishop",  "wiimusic","spongebob"
+    sounds: [
+      "clown",
+      "dirtman",
+      "jeopardy",
+      "penapple",
+      "corn",
+      "wiishop",
+      "wiimusic",
+      "spongebob"
     ]
   },
 
@@ -381,15 +346,16 @@ const folderData = [
     sounds: [
       "ready",
       "spongebobfail",
-      "mayo","money",      "thatsroughbuddy",
-
+      "mayo",
+      "money",
+      "thatsroughbuddy"
     ]
   }
 
 ];
 
 // ==================================
-// COLOR ROTATION
+// COLORS
 // ==================================
 
 const colors = [
@@ -403,19 +369,43 @@ const colors = [
 ];
 
 // ==================================
-// CREATE FOLDERS AND FILES
+// ONE REUSABLE AUDIO PLAYER
 // ==================================
 
-const folders = document.getElementById("folders");
+const audio = new Audio();
 
-let currentSound = null;
+audio.preload = "none";
+
 let currentButton = null;
+let currentDurationDisplay = null;
 
-let audioPlayers = [];
+const folders = document.getElementById("folders");
+const status = document.getElementById("status");
+const timer = document.getElementById("timer");
+
+// ==================================
+// FORMAT TIME
+// ==================================
+
+function formatTime(seconds) {
+
+  if (!Number.isFinite(seconds)) {
+    return "00:00";
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return String(minutes).padStart(2, "0") +
+    ":" +
+    String(secs).padStart(2, "0");
+}
+
+// ==================================
+// CREATE FOLDERS AND BUTTONS
+// ==================================
 
 folderData.forEach(folder => {
-
-  // CREATE FOLDER HEADER
 
   const header = document.createElement("button");
 
@@ -431,8 +421,6 @@ folderData.forEach(folder => {
 
   content.className = "folder-content";
 
-  // EXPAND / COLLAPSE FOLDER
-
   header.addEventListener("click", () => {
 
     content.classList.toggle("hidden");
@@ -440,26 +428,14 @@ folderData.forEach(folder => {
 
   });
 
-  // CREATE MP3 BUTTONS
-
   folder.sounds.forEach((soundName, index) => {
 
-    const audio = document.createElement("audio");
-
-    audio.src =
+    const audioPath =
       "sounds/" +
       folder.name +
       "/" +
       encodeURIComponent(soundName) +
       ".mp3";
-
-    audio.preload = "metadata";
-
-    document.body.appendChild(audio);
-
-    audioPlayers.push(audio);
-
-    // BUTTON
 
     const button = document.createElement("button");
 
@@ -488,67 +464,34 @@ folderData.forEach(folder => {
     const durationDisplay =
       button.querySelector(".duration");
 
-    // LOAD DURATION
+    // LOAD DURATION WHEN NEEDED
 
-    function showDuration() {
+    const metadataAudio = new Audio();
 
-      if (Number.isFinite(audio.duration)) {
+    metadataAudio.preload = "metadata";
+    metadataAudio.src = audioPath;
 
-        durationDisplay.textContent =
-          formatTime(audio.duration);
-
-      }
-
-    }
-
-    audio.addEventListener("loadedmetadata", showDuration);
-    audio.addEventListener("durationchange", showDuration);
-
-    audio.addEventListener("error", () => {
+    metadataAudio.addEventListener("loadedmetadata", () => {
 
       durationDisplay.textContent =
-        "FILE NOT FOUND";
+        formatTime(metadataAudio.duration);
 
-    });
+      metadataAudio.removeAttribute("src");
+      metadataAudio.load();
 
-    // UPDATE PROGRESS
+    }, { once: true });
 
-    audio.addEventListener("timeupdate", () => {
+    metadataAudio.addEventListener("error", () => {
 
-      if (audio === currentSound) {
+      durationDisplay.textContent = "UNAVAILABLE";
 
-        updateProgress();
-
-      }
-
-    });
-
-    // WHEN SOUND FINISHES
-
-    audio.addEventListener("ended", () => {
-
-      if (audio === currentSound) {
-
-        resetDisplay();
-
-        currentSound = null;
-        currentButton = null;
-
-        document.getElementById("timer").textContent =
-          "00:00 / 00:00";
-
-        document.getElementById("status").textContent =
-          "🎮 SOUND EFFECTS";
-
-      }
-
-    });
+    }, { once: true });
 
     // PLAY SOUND
 
     button.addEventListener("click", () => {
 
-      playSound(audio, button, soundName);
+      playSound(audioPath, button, soundName, durationDisplay);
 
     });
 
@@ -562,94 +505,106 @@ folderData.forEach(folder => {
 });
 
 // ==================================
-// FORMAT TIME
-// ==================================
-
-function formatTime(seconds) {
-
-  if (!Number.isFinite(seconds)) {
-    return "00:00";
-  }
-
-  const minutes = Math.floor(seconds / 60);
-
-  const secs = Math.floor(seconds % 60);
-
-  return String(minutes).padStart(2, "0") +
-    ":" +
-    String(secs).padStart(2, "0");
-
-}
-
-// ==================================
 // PLAY SOUND
 // ==================================
 
-function playSound(audio, button, name) {
+function playSound(path, button, name, durationDisplay) {
 
   stopSound();
 
-  currentSound = audio;
   currentButton = button;
+  currentDurationDisplay = durationDisplay;
 
-  currentButton.classList.add("playing");
+  button.classList.add("playing");
 
-  document.getElementById("status").textContent =
+  status.textContent =
     "▶ PLAYING: " + name.toUpperCase();
 
-  audio.currentTime = 0;
+  audio.src = path;
+  audio.load();
 
   audio.play().catch(error => {
 
     console.log("Playback error:", error);
 
-    document.getElementById("status").textContent =
-      "⚠️ SOUND COULD NOT PLAY";
+    if (currentButton === button) {
 
-    resetDisplay();
+      status.textContent =
+        "⚠️ SOUND COULD NOT PLAY";
 
-    currentSound = null;
-    currentButton = null;
+      stopSound();
+
+    }
 
   });
 
 }
 
 // ==================================
-// UPDATE PROGRESS AND TIMER
+// UPDATE TIMER AND PROGRESS
 // ==================================
 
-function updateProgress() {
+audio.addEventListener("timeupdate", () => {
 
-  if (!currentSound) return;
+  if (!currentButton) return;
 
-  const duration = currentSound.duration;
+  const current = audio.currentTime;
+  const duration = audio.duration;
 
-  const current = currentSound.currentTime;
-
-  document.getElementById("timer").textContent =
+  timer.textContent =
     formatTime(current) +
     " / " +
     formatTime(duration);
 
-  if (currentButton && duration > 0) {
+  const fill =
+    currentButton.querySelector(".progress-fill");
 
-    const fill =
-      currentButton.querySelector(".progress-fill");
+  if (fill && duration > 0) {
 
-    if (fill) {
-
-      fill.style.width =
-        (current / duration * 100) + "%";
-
-    }
+    fill.style.width =
+      (current / duration * 100) + "%";
 
   }
 
-}
+});
 
 // ==================================
-// RESET DISPLAY
+// UPDATE DURATION
+// ==================================
+
+audio.addEventListener("loadedmetadata", () => {
+
+  if (currentDurationDisplay) {
+
+    currentDurationDisplay.textContent =
+      formatTime(audio.duration);
+
+  }
+
+  timer.textContent =
+    "00:00 / " + formatTime(audio.duration);
+
+});
+
+// ==================================
+// SOUND FINISHED
+// ==================================
+
+audio.addEventListener("ended", () => {
+
+  resetDisplay();
+
+  currentButton = null;
+  currentDurationDisplay = null;
+
+  timer.textContent = "00:00 / 00:00";
+
+  status.textContent = "🎮 SOUND EFFECTS";
+
+});
+
+// ==================================
+// RESET BUTTONS
 // ==================================
 
 function resetDisplay() {
@@ -662,9 +617,7 @@ function resetDisplay() {
       button.querySelector(".progress-fill");
 
     if (fill) {
-
       fill.style.width = "0%";
-
     }
 
   });
@@ -672,28 +625,26 @@ function resetDisplay() {
 }
 
 // ==================================
-// STOP ALL SOUNDS
+// STOP SOUND
 // ==================================
 
 function stopSound() {
 
-  audioPlayers.forEach(audio => {
+  audio.pause();
 
-    audio.pause();
-    audio.currentTime = 0;
+  audio.currentTime = 0;
 
-  });
+  audio.removeAttribute("src");
+  audio.load();
 
   resetDisplay();
 
-  currentSound = null;
   currentButton = null;
+  currentDurationDisplay = null;
 
-  document.getElementById("timer").textContent =
-    "00:00 / 00:00";
+  timer.textContent = "00:00 / 00:00";
 
-  document.getElementById("status").textContent =
-    "🎮 SOUND EFFECTS";
+  status.textContent = "🎮 SOUND EFFECTS";
 
 }
 
@@ -701,3 +652,4 @@ function stopSound() {
 
 </body>
 </html>
+ h
