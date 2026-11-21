@@ -241,6 +241,8 @@ const soundEmojis = {
   tada: "🎉",
   whip: "🏏",
   yeahbaby: "🤩",
+  whyareyoubooing: "👀",
+  congrats: "🎉",
   
   easy: "😎",
   fine: "😢",
@@ -270,6 +272,7 @@ const soundEmojis = {
   corn: "🌽",
   wiishop: "🛒",
   wiimusic: "🎶",
+  heya: "👋🏻",
   spongebob: "🤪",
   baconpancakes: "🥞",
   ready: "🍍🧽",
@@ -309,7 +312,9 @@ const folderData = [
       "tada",
       "happi",
       "whip",
-      "yeahbaby"
+      "yeahbaby",
+      "congrats",
+      "whyareyoubooing"
     ]
   },
 
@@ -351,6 +356,7 @@ const folderData = [
       "wiimusic",
       "spongebob",
       "baconpancakes",
+      "heya",
     ]
   },
 
@@ -525,8 +531,19 @@ folderData.forEach(folder => {
 // PLAY SOUND
 // ==================================
 
+// ==================================
+// PLAY SOUND
+// ==================================
+
 function playSound(path, button, name, durationDisplay) {
 
+  // If this exact sound is already playing, stop it
+  if (currentButton === button && !audio.paused) {
+    stopSound();
+    return;
+  }
+
+  // Stop any other sound before playing this one
   stopSound();
 
   currentButton = button;
@@ -556,7 +573,6 @@ function playSound(path, button, name, durationDisplay) {
   });
 
 }
-
 // ==================================
 // UPDATE TIMER AND PROGRESS
 // ==================================
