@@ -203,6 +203,51 @@ body {
     font-size: 13px;
   }
 }
+
+/* SEARCH BAR */
+
+#search-container {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+}
+
+#search {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border: 2px solid #0756c9;
+  border-radius: 13px;
+  background: #383838;
+  color: white;
+  font-size: 18px;
+  outline: none;
+}
+
+#search::placeholder {
+  color: #bbbbbb;
+}
+
+#search:focus {
+  border-color: #ffc107;
+}
+
+#clear-search {
+  min-width: 55px;
+  border: none;
+  border-radius: 13px;
+  background: #dc3545;
+  color: white;
+  font-size: 23px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.folder-header.search-hidden,
+.folder-content.search-hidden {
+  display: none;
+}
+
 </style>
 </head>
 
@@ -211,7 +256,18 @@ body {
 <div id="screen">
 
   <div id="status">🎮 SOUND EFFECTS</div>
+<div id="search-container">
+  <input
+    type="text"
+    id="search"
+    placeholder="🔍 Search sound effects..."
+    autocomplete="off"
+  >
 
+  <button id="clear-search" onclick="clearSearch()">
+    ✕
+  </button>
+</div>
   <div id="folders"></div>
 
   <div id="timer">00:00 / 00:00</div>
@@ -223,6 +279,89 @@ body {
 </div>
 
 <script>
+  // ==================================
+// SEARCH FUNCTION
+// ==================================
+
+const searchInput = document.getElementById("search");
+
+function searchSounds() {
+
+  const query = searchInput.value
+    .trim()
+    .toLowerCase();
+
+  const allFolders = document.querySelectorAll(
+    ".folder-header"
+  );
+
+  allFolders.forEach(header => {
+
+    const content = header.nextElementSibling;
+
+    const soundButtons = content.querySelectorAll(
+      ".sound-file"
+    );
+
+    let matches = 0;
+
+    soundButtons.forEach(button => {
+
+      const soundName = button
+        .querySelector(".file-name")
+        .textContent
+        .toLowerCase();
+
+      const match = soundName.includes(query);
+
+      button.style.display = match ? "flex" : "none";
+
+      if (match) {
+        matches++;
+      }
+
+    });
+
+    if (query === "") {
+
+      header.classList.remove("search-hidden");
+      content.classList.remove("search-hidden");
+
+    } else if (matches > 0) {
+
+      header.classList.remove("search-hidden");
+      content.classList.remove("search-hidden");
+
+      // Automatically open matching folders
+      content.classList.remove("hidden");
+      header.classList.remove("closed");
+
+    } else {
+
+      header.classList.add("search-hidden");
+      content.classList.add("search-hidden");
+
+    }
+
+  });
+
+}
+
+// Search while typing
+searchInput.addEventListener("input", searchSounds);
+
+
+// ==================================
+// CLEAR SEARCH
+// ==================================
+
+function clearSearch() {
+
+  searchInput.value = "";
+
+  searchSounds();
+
+}
 
 // ==================================
 // EMOJIS
@@ -306,6 +445,7 @@ const soundEmojis = {
   dishonor: "🐉",
   myleg: "🦵",
   verynice: "👌",
+  problem: "🤪",
   adult: "👴",
   repressed: "👎",
   chance: "🎲",
@@ -441,6 +581,7 @@ const folderData = [
   "repressed",
   "ifyouaintfirst",
   "chance",
+  "problem",
     ]
   }
 
